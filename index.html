@@ -45,6 +45,64 @@
     overflow: hidden;
   }
 
+  /* Loading screen: brief tour of the 12 months before the experience starts */
+  #loading-screen {
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(165deg, var(--red) 0%, var(--red-deep) 100%);
+    transition: opacity 0.6s ease;
+  }
+
+  #loading-screen.fade-out {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .loading-inner {
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .loading-month {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 2.4rem;
+    color: var(--white);
+    margin: 0.8rem 0 1.6rem;
+    min-height: 3rem;
+    transition: opacity 0.15s ease;
+  }
+
+  .loading-bar {
+    width: 200px;
+    max-width: 55vw;
+    height: 3px;
+    background: rgba(255, 249, 245, 0.2);
+    border-radius: 999px;
+    margin: 0 auto 1.1rem;
+    overflow: hidden;
+  }
+
+  .loading-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--gold);
+    border-radius: 999px;
+    transition: width 0.22s linear;
+  }
+
+  .loading-caption {
+    font-size: 1rem;
+    font-style: italic;
+    color: var(--pink);
+    letter-spacing: 0.04em;
+    margin: 0;
+  }
+
   /* Falling hearts background, behind all chapters, visible throughout */
   #hearts-bg {
     position: absolute;
@@ -105,12 +163,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    justify-content: safe center;
-    padding: 2.2rem 1.75rem 10rem;
-    overflow: hidden auto;
+    overflow-x: hidden;
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    text-align: center;
     opacity: 0;
     transform: translateX(40px);
     transition: opacity 0.6s ease, transform 0.6s ease;
@@ -121,6 +176,18 @@
     opacity: 1;
     transform: translateX(0);
     pointer-events: auto;
+  }
+
+  /*
+    Vertical centering via auto margins (not justify-content:center) so
+    that when content is taller than the screen, it safely falls back to
+    top-aligned + scrollable instead of overflowing unreachably above.
+  */
+  .chapter-content {
+    width: 100%;
+    margin: auto 0;
+    padding: 2.6rem 1.75rem 10rem;
+    text-align: center;
   }
 
   .chapter.leaving {
@@ -148,6 +215,7 @@
     font-size: 1.35rem;
     line-height: 1.6;
     max-width: 340px;
+    margin: 0 auto;
     color: var(--white);
   }
 
@@ -162,6 +230,7 @@
     font-size: 1.15rem;
     line-height: 1.55;
     max-width: 350px;
+    margin: 0 auto;
     color: var(--white);
   }
 
@@ -220,7 +289,7 @@
     color: var(--pink);
     font-style: italic;
     max-width: 320px;
-    margin-top: 1.2rem;
+    margin: 1.2rem auto 0;
   }
 
   #nav-controls {
@@ -309,7 +378,7 @@
     font-size: 1.75rem;
     line-height: 1.5;
     color: var(--white);
-    margin-bottom: 2.4rem;
+    margin: 0 auto 2.4rem;
     max-width: 350px;
   }
 
@@ -386,7 +455,7 @@
     line-height: 1.5;
     color: var(--white);
     max-width: 340px;
-    margin-bottom: 1.8rem;
+    margin: 0 auto 1.8rem;
   }
 
   .agenda-list {
@@ -472,6 +541,14 @@
 <body>
 
 <div id="stage">
+  <div id="loading-screen">
+    <div class="loading-inner">
+      <div class="ornament">&#10084;</div>
+      <div class="loading-month" id="loading-month">Septiembre</div>
+      <div class="loading-bar"><div class="loading-bar-fill" id="loading-bar-fill"></div></div>
+      <p class="loading-caption">Preparando nuestro recorrido...</p>
+    </div>
+  </div>
   <div id="hearts-bg"></div>
   <audio id="bg-audio" loop preload="auto"></audio>
   <button id="mute-btn" aria-label="Silenciar música">&#128266;</button>
@@ -632,6 +709,48 @@
     return Math.random() * (max - min) + min;
   }
 
+  function preloadAllPhotos() {
+    Object.values(FOTOS_POR_MES).flat().forEach((archivo) => {
+      const img = new Image();
+      img.src = `fotos/${encodeURIComponent(archivo)}`;
+    });
+  }
+
+  function runLoadingScreen(onComplete) {
+    const screen = document.getElementById('loading-screen');
+    const monthLabel = document.getElementById('loading-month');
+    const barFill = document.getElementById('loading-bar-fill');
+    const names = [
+      "Septiembre", "Octubre", "Noviembre", "Diciembre",
+      "Enero", "Febrero", "Marzo", "Abril",
+      "Mayo", "Junio", "Julio", "Agosto"
+    ];
+    const stepMs = 250;
+    let i = 0;
+
+    monthLabel.textContent = names[0];
+    barFill.style.width = `${(100 / names.length).toFixed(1)}%`;
+
+    const interval = setInterval(() => {
+      i += 1;
+      if (i >= names.length) {
+        clearInterval(interval);
+        screen.classList.add('fade-out');
+        setTimeout(() => {
+          screen.remove();
+          if (onComplete) onComplete();
+        }, 600);
+        return;
+      }
+      monthLabel.style.opacity = '0';
+      setTimeout(() => {
+        monthLabel.textContent = names[i];
+        monthLabel.style.opacity = '1';
+      }, 90);
+      barFill.style.width = `${((i + 1) / names.length * 100).toFixed(1)}%`;
+    }, stepMs);
+  }
+
   function buildHeartsBackground() {
     if (prefersReducedMotion) return;
     const colors = ['var(--white)', 'var(--pink)', 'var(--gold)'];
@@ -686,12 +805,14 @@
     div.className = 'chapter';
     div.dataset.index = index;
     div.innerHTML = `
-      <div class="ornament">&#10084;</div>
-      <p class="greeting-text">
-        Hola mi vida, ¿cómo estás? Nuevamente yo por aquí.
-        He diseñado este lugar para recordarte lo importante que eres para mí,
-        y para <strong>felicitarnos por haber permanecido juntos durante este año</strong>.
-      </p>
+      <div class="chapter-content">
+        <div class="ornament">&#10084;</div>
+        <p class="greeting-text">
+          Hola mi vida, ¿cómo estás? Nuevamente yo por aquí.
+          He diseñado este lugar para recordarte lo importante que eres para mí,
+          y para <strong>felicitarnos por haber permanecido juntos durante este año</strong>.
+        </p>
+      </div>
     `;
     return div;
   }
@@ -701,19 +822,29 @@
     div.className = 'chapter';
     div.dataset.index = index;
     div.innerHTML = `
-      <div class="ornament">&#10084;</div>
-      <p class="intro-text">
-        En este lugar vas a encontrar una pequeña recopilación de todo lo que vivimos
-        a lo largo de este año tan especial. Cada mes tiene su propia historia, sus
-        propios momentos, y quise guardarlos aquí para recorrerlos juntos una vez más.
-        Hubo risas, distancias que no importaron, y días comunes que se sintieron
-        extraordinarios solo por estar a tu lado. ¿Quieres verlo conmigo?
-      </p>
+      <div class="chapter-content">
+        <div class="ornament">&#10084;</div>
+        <p class="intro-text">
+          En este lugar vas a encontrar una pequeña recopilación de todo lo que vivimos
+          a lo largo de este año tan especial. Cada mes tiene su propia historia, sus
+          propios momentos, y quise guardarlos aquí para recorrerlos juntos una vez más.
+          Hubo risas, distancias que no importaron, y días comunes que se sintieron
+          extraordinarios solo por estar a tu lado. ¿Quieres verlo conmigo?
+        </p>
+      </div>
     `;
     return div;
   }
 
-  const PHOTO_MAX_WIDTH = 340; // safety cap so an extra-wide photo never overflows the screen
+  function getPhotoMaxWidth() {
+    // Measured live against the real device viewport (not a guessed constant),
+    // so a photo's rendered width can never exceed what actually fits on screen.
+    const CHAPTER_PADDING_X = 28 * 2; // .chapter-content: 1.75rem each side
+    const SCATTER_PADDING_X = 24 * 2; // .photo-scatter: 1.5rem each side
+    const ROTATION_BLEED_BUFFER = 16; // extra margin for the slight random rotation
+    const available = stage.clientWidth - CHAPTER_PADDING_X - SCATTER_PADDING_X - ROTATION_BLEED_BUFFER;
+    return Math.max(140, available);
+  }
 
   function tileHeightFor(count) {
     if (count <= 2) return 260;
@@ -730,7 +861,7 @@
       img.style.opacity = '1';
       return;
     }
-    const scale = Math.min(targetHeight / nh, PHOTO_MAX_WIDTH / nw);
+    const scale = Math.min(targetHeight / nh, getPhotoMaxWidth() / nw);
     img.style.width = `${Math.round(nw * scale)}px`;
     img.style.height = `${Math.round(nh * scale)}px`;
     img.style.opacity = '1';
@@ -757,12 +888,14 @@
     });
 
     div.innerHTML = `
-      <h1 class="month-title">${cap.mes}</h1>
-      ${cap.subtitle ? `<p class="month-subtitle">${cap.subtitle}</p>` : ''}
-      <div class="photo-scatter">
-        ${tilesHtml}
+      <div class="chapter-content">
+        <h1 class="month-title">${cap.mes}</h1>
+        ${cap.subtitle ? `<p class="month-subtitle">${cap.subtitle}</p>` : ''}
+        <div class="photo-scatter">
+          ${tilesHtml}
+        </div>
+        <p class="month-anecdote">${cap.texto}</p>
       </div>
-      <p class="month-anecdote">${cap.texto}</p>
     `;
 
     div.querySelectorAll('.tile-frame img').forEach((img) => {
@@ -782,11 +915,13 @@
     div.className = 'chapter';
     div.dataset.index = index;
     div.innerHTML = `
-      <div class="ornament">&#10084;</div>
-      <p class="intro-text">
-        Por todo lo que hemos vivido este año, y por todo lo que viviremos
-        más adelante, me gustaría preguntarte algo.
-      </p>
+      <div class="chapter-content">
+        <div class="ornament">&#10084;</div>
+        <p class="intro-text">
+          Por todo lo que hemos vivido este año, y por todo lo que viviremos
+          más adelante, me gustaría preguntarte algo.
+        </p>
+      </div>
     `;
     return div;
   }
@@ -796,12 +931,14 @@
     div.className = 'chapter';
     div.dataset.index = index;
     div.innerHTML = `
-      <p class="invite-question">¿Me concederías el honor de pasar el día de mañana a tu lado?</p>
-      <div class="invite-buttons">
-        <button id="accept-btn">Sí</button>
-        <button id="reject-btn">No</button>
+      <div class="chapter-content">
+        <p class="invite-question">¿Me concederías el honor de pasar el día del 27 de septiembre a tu lado?</p>
+        <div class="invite-buttons">
+          <button id="accept-btn">Sí</button>
+          <button id="reject-btn">No</button>
+        </div>
+        <p id="reject-taunt"></p>
       </div>
-      <p id="reject-taunt"></p>
     `;
     return div;
   }
@@ -811,19 +948,21 @@
     div.className = 'chapter';
     div.dataset.index = index;
     div.innerHTML = `
-      <p class="agenda-message">
-        Me haces el hombre más feliz, honrado y bendecido del mundo entero,
-        mi princesa hermosa, el amor de mi vida. Espero que descanses bien,
-        mañana nuestra agenda está un poco apretada:
-      </p>
-      <ol class="agenda-list">
-        <li>Iglesia</li>
-        <li>Almuerzo</li>
-        <li>Descanso en casa</li>
-        <li>Parque de la Vida</li>
-        <li>Cena</li>
-        <li>&nbsp;</li>
-      </ol>
+      <div class="chapter-content">
+        <p class="agenda-message">
+          Me haces el hombre más feliz, honrado y bendecido del mundo entero,
+          mi princesa hermosa, el amor de mi vida. Espero que descanses bien,
+          este 27 de septiembre nuestra agenda está un poco apretada:
+        </p>
+        <ol class="agenda-list">
+          <li>Iglesia</li>
+          <li>Almuerzo</li>
+          <li>Descanso en casa</li>
+          <li>Parque de la Vida</li>
+          <li>Cena</li>
+          <li>&nbsp;</li>
+        </ol>
+      </div>
     `;
     return div;
   }
@@ -833,9 +972,11 @@
     div.className = 'chapter';
     div.dataset.index = index;
     div.innerHTML = `
-      <div class="final-icon">&#10084;</div>
-      <h1 class="final-title">Te veo mañana.</h1>
-      <button class="btn-goodbye" id="goodbye-btn">Hasta mañana</button>
+      <div class="chapter-content">
+        <div class="final-icon">&#10084;</div>
+        <h1 class="final-title">Te veo este 27 de septiembre.</h1>
+        <button class="btn-goodbye" id="goodbye-btn">Hasta el 27 de septiembre</button>
+      </div>
     `;
     return div;
   }
@@ -850,6 +991,8 @@
   function init() {
     buildHeartsBackground();
     initAudio();
+    preloadAllPhotos();
+    runLoadingScreen();
 
     const greeting = buildGreetingChapter(0);
     stage.insertBefore(greeting, navControls);
