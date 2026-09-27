@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <title>Un año juntos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,6 +41,7 @@
     width: 100%;
     max-width: 480px;
     height: 100vh;
+    height: 100dvh; /* accounts for mobile browser toolbars that 100vh ignores */
     max-height: 900px;
     overflow: hidden;
   }
@@ -54,11 +55,15 @@
     align-items: center;
     justify-content: center;
     background: linear-gradient(165deg, var(--red) 0%, var(--red-deep) 100%);
-    transition: opacity 0.6s ease;
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+    will-change: opacity, transform;
   }
 
   #loading-screen.fade-out {
     opacity: 0;
+    transform: scale(1.18);
     pointer-events: none;
   }
 
@@ -186,7 +191,7 @@
   .chapter-content {
     width: 100%;
     margin: auto 0;
-    padding: 2.6rem 1.75rem 10rem;
+    padding: 2.6rem 1.75rem calc(10rem + env(safe-area-inset-bottom, 0px));
     text-align: center;
   }
 
@@ -302,7 +307,7 @@
     align-items: flex-end;
     justify-content: center;
     gap: 1rem;
-    padding: 5.5rem 1.5rem 1.6rem;
+    padding: 5.5rem 1.5rem calc(1.6rem + env(safe-area-inset-bottom, 0px));
     background: linear-gradient(to top, var(--red-deep) 0%, var(--red-deep) 38%, rgba(125, 15, 40, 0) 100%);
   }
 
@@ -351,7 +356,7 @@
 
   .progress {
     position: absolute;
-    top: 1.4rem;
+    top: calc(1.4rem + env(safe-area-inset-top, 0px));
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -507,8 +512,8 @@
   /* Mute toggle */
   #mute-btn {
     position: absolute;
-    top: 1.2rem;
-    right: 1.2rem;
+    top: calc(1.2rem + env(safe-area-inset-top, 0px));
+    right: calc(1.2rem + env(safe-area-inset-right, 0px));
     z-index: 15;
     width: 2.3rem;
     height: 2.3rem;
@@ -720,12 +725,8 @@
     const screen = document.getElementById('loading-screen');
     const monthLabel = document.getElementById('loading-month');
     const barFill = document.getElementById('loading-bar-fill');
-    const names = [
-      "Septiembre", "Octubre", "Noviembre", "Diciembre",
-      "Enero", "Febrero", "Marzo", "Abril",
-      "Mayo", "Junio", "Julio", "Agosto"
-    ];
-    const stepMs = 250;
+    const names = CAPITULOS.slice(0, -1).map((cap) => cap.mes); // 12 unique months, Septiembre a Agosto
+    const stepMs = 1000;
     let i = 0;
 
     monthLabel.textContent = names[0];
@@ -739,7 +740,7 @@
         setTimeout(() => {
           screen.remove();
           if (onComplete) onComplete();
-        }, 600);
+        }, 900);
         return;
       }
       monthLabel.style.opacity = '0';
