@@ -24,6 +24,7 @@
     margin: 0;
     padding: 0;
     height: 100%;
+    min-height: 100dvh; /* keeps html/body in sync with #stage's dynamic sizing below */
     background: linear-gradient(165deg, var(--red) 0%, var(--red-deep) 100%);
     color: var(--white);
     font-family: 'Cormorant Garamond', serif;
@@ -42,6 +43,7 @@
     max-width: 480px;
     height: 100vh;
     height: 100dvh; /* accounts for mobile browser toolbars that 100vh ignores */
+    min-height: 100dvh;
     max-height: 900px;
     overflow: hidden;
   }
@@ -191,7 +193,7 @@
   .chapter-content {
     width: 100%;
     margin: auto 0;
-    padding: 2.6rem 1.75rem calc(10rem + env(safe-area-inset-bottom, 0px));
+    padding: 2.6rem 1.75rem calc(11rem + env(safe-area-inset-bottom, 0px));
     text-align: center;
   }
 
@@ -307,7 +309,11 @@
     align-items: flex-end;
     justify-content: center;
     gap: 1rem;
-    padding: 5.5rem 1.5rem calc(1.6rem + env(safe-area-inset-bottom, 0px));
+    /* Bottom padding stacks three defenses: a solid fixed buffer (works even
+       when Android Chrome reports safe-area-inset-bottom as 0), an explicit
+       extra cushion for its collapsible bottom toolbar, and env() on top for
+       devices that do report it correctly (notches, gesture bars). */
+    padding: 5.5rem 1.5rem calc(3rem + env(safe-area-inset-bottom, 0px));
     background: linear-gradient(to top, var(--red-deep) 0%, var(--red-deep) 38%, rgba(125, 15, 40, 0) 100%);
   }
 
