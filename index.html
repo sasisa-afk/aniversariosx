@@ -2,25 +2,1075 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Un momento...</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Un año juntos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --red: #c31f3f;
+    --red-deep: #7d0f28;
+    --red-bright: #e14060;
+    --white: #fff9f5;
+    --pink: #ffc9d3;
+    --gold: #d9a75a;
+    --ink: #3a0d16;
+  }
+
+  * { box-sizing: border-box; }
+
   html, body {
     margin: 0;
+    padding: 0;
     height: 100%;
+    background: linear-gradient(165deg, var(--red) 0%, var(--red-deep) 100%);
+    color: var(--white);
+    font-family: 'Cormorant Garamond', serif;
+    overflow: hidden;
+  }
+
+  body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #1a1410;
-    color: #e6cd97;
-    font-family: Georgia, serif;
-    font-size: 1.3rem;
+  }
+
+  #stage {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    height: 100vh;
+    max-height: 900px;
+    overflow: hidden;
+  }
+
+  /* Falling hearts background, behind all chapters, visible throughout */
+  #hearts-bg {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .heart {
+    position: absolute;
+    top: -10%;
+    will-change: transform, opacity;
+    animation-name: heartFall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  @keyframes heartFall {
+    0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+    8% { opacity: 0.8; }
+    92% { opacity: 0.8; }
+    100% { transform: translateY(120vh) translateX(var(--drift, 0px)) rotate(25deg); opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .heart { animation: none; opacity: 0.35; }
+  }
+
+  /* Fireworks burst, shown briefly when "Sí" is pressed */
+  #fireworks {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 30;
+  }
+
+  .fw-particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    box-shadow: 0 0 6px currentColor;
+    animation-name: fw-burst;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes fw-burst {
+    to { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; }
+  }
+
+  .chapter {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    justify-content: safe center;
+    padding: 2.2rem 1.75rem 10rem;
+    overflow: hidden auto;
+    -webkit-overflow-scrolling: touch;
     text-align: center;
-    padding: 2rem;
+    opacity: 0;
+    transform: translateX(40px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    pointer-events: none;
+  }
+
+  .chapter.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+
+  .chapter.leaving {
+    transform: translateX(-40px);
+  }
+
+  .chapter.leaving-reverse {
+    transform: translateX(40px);
+  }
+
+  .chapter.entering-reverse {
+    transform: translateX(-40px);
+  }
+
+  .ornament {
+    font-size: 1.1rem;
+    color: var(--gold);
+    letter-spacing: 0.3em;
+    margin-bottom: 0.6rem;
+    opacity: 0.85;
+  }
+
+  /* Greeting chapter */
+  .greeting-text {
+    font-size: 1.35rem;
+    line-height: 1.6;
+    max-width: 340px;
+    color: var(--white);
+  }
+
+  .greeting-text strong {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    color: var(--pink);
+  }
+
+  /* Intro chapter */
+  .intro-text {
+    font-size: 1.15rem;
+    line-height: 1.55;
+    max-width: 350px;
+    color: var(--white);
+  }
+
+  .month-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 3rem;
+    color: var(--white);
+    margin: 0 0 1.4rem 0;
+    letter-spacing: 0.02em;
+  }
+
+  .month-subtitle {
+    font-size: 1.25rem;
+    color: var(--pink);
+    font-style: italic;
+    margin: -0.9rem 0 1.3rem;
+  }
+
+  .photo-scatter {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
+    align-items: flex-start;
+    gap: 2rem 1.5rem;
+    width: 100%;
+    padding: 0 1.5rem;
+  }
+
+  .photo-tile {
+    flex: 0 0 auto;
+    max-width: 100%;
+  }
+
+  .tile-frame {
+    display: inline-block;
+    max-width: 100%;
+    background: var(--white);
+    padding: 6px 6px 11px;
+    border-radius: 4px;
+    box-shadow: 0 14px 26px -14px rgba(0,0,0,0.55);
+    line-height: 0;
+  }
+
+  .tile-frame img {
+    display: block;
+    border-radius: 2px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .month-anecdote {
+    font-size: 1.3rem;
+    line-height: 1.5;
+    color: var(--pink);
+    font-style: italic;
+    max-width: 320px;
+    margin-top: 1.2rem;
+  }
+
+  #nav-controls {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 1rem;
+    padding: 5.5rem 1.5rem 1.6rem;
+    background: linear-gradient(to top, var(--red-deep) 0%, var(--red-deep) 38%, rgba(125, 15, 40, 0) 100%);
+  }
+
+  #next-btn {
+    font-family: 'Playfair Display', serif;
+    background: var(--white);
+    color: var(--red-deep);
+    border: 1px solid var(--gold);
+    font-size: 1.05rem;
+    letter-spacing: 0.03em;
+    padding: 0.75rem 2.2rem;
+    cursor: pointer;
+    border-radius: 999px;
+    transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 10px 25px -10px rgba(0,0,0,0.5);
+  }
+
+  #next-btn:hover {
+    background: var(--pink);
+  }
+
+  #next-btn:active {
+    transform: scale(0.96);
+  }
+
+  #back-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 249, 245, 0.65);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+    padding: 0.6rem 0.5rem;
+    cursor: pointer;
+    transition: color 0.25s ease, transform 0.2s ease;
+  }
+
+  #back-btn:hover {
+    color: var(--gold);
+  }
+
+  #back-btn:active {
+    transform: scale(0.94);
+  }
+
+  .progress {
+    position: absolute;
+    top: 1.4rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 10;
+  }
+
+  .progress span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 249, 245, 0.25);
+    transition: background 0.3s ease, transform 0.3s ease;
+  }
+
+  .progress span.done {
+    background: var(--gold);
+    transform: scale(1.15);
+  }
+
+  /* Invitation chapter */
+  .invite-question {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.75rem;
+    line-height: 1.5;
+    color: var(--white);
+    margin-bottom: 2.4rem;
+    max-width: 350px;
+  }
+
+  .invite-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+    width: 100%;
+  }
+
+  #accept-btn {
+    font-family: 'Playfair Display', serif;
+    background: var(--white);
+    color: var(--red-deep);
+    border: 1px solid var(--gold);
+    padding: 0.9rem 2.4rem;
+    font-size: 1.15rem;
+    letter-spacing: 0.03em;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 0.35s ease, font-size 0.35s ease, box-shadow 0.35s ease, background 0.35s ease;
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.6);
+  }
+
+  #accept-btn:hover {
+    background: var(--pink);
+  }
+
+  #reject-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 249, 245, 0.5);
+    color: rgba(255, 249, 245, 0.85);
+    padding: 0.55rem 1.6rem;
+    font-size: 0.95rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  #reject-taunt {
+    min-height: 1.6rem;
+    color: var(--pink);
+    font-style: italic;
+    font-size: 1rem;
+    margin-top: 1.2rem;
+  }
+
+  /* Final confirmation */
+  .final-icon {
+    font-size: 2.4rem;
+    color: var(--pink);
+    margin-bottom: 1.2rem;
+  }
+
+  .final-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.3rem;
+    color: var(--white);
+    margin-bottom: 0.8rem;
+  }
+
+  .final-sub {
+    font-size: 1.3rem;
+    color: var(--pink);
+    font-style: italic;
+  }
+
+  /* Agenda chapter */
+  .agenda-message {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    line-height: 1.5;
+    color: var(--white);
+    max-width: 340px;
+    margin-bottom: 1.8rem;
+  }
+
+  .agenda-list {
+    list-style: decimal;
+    text-align: left;
+    max-width: 280px;
+    width: 100%;
+    margin: 0 auto;
+    padding-left: 1.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .agenda-list li {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: var(--white);
+  }
+
+  .agenda-list li::marker {
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  /* Goodbye chapter */
+  .btn-goodbye {
+    font-family: 'Playfair Display', serif;
+    background: var(--white);
+    color: var(--red-deep);
+    border: 1px solid var(--gold);
+    padding: 0.9rem 2.4rem;
+    font-size: 1.15rem;
+    letter-spacing: 0.03em;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.6);
+  }
+
+  .btn-goodbye:hover {
+    background: var(--pink);
+  }
+
+  .btn-goodbye:active {
+    transform: scale(0.96);
+  }
+
+  /* Mute toggle */
+  #mute-btn {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.2rem;
+    z-index: 15;
+    width: 2.3rem;
+    height: 2.3rem;
+    border-radius: 50%;
+    border: 1px solid rgba(217, 167, 90, 0.5);
+    background: rgba(0, 0, 0, 0.25);
+    color: var(--gold);
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.25s ease, color 0.25s ease;
+  }
+
+  #mute-btn:hover {
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  @media (max-width: 360px) {
+    .greeting-text { font-size: 1.2rem; }
+    .month-title { font-size: 2.5rem; }
+    .month-subtitle { font-size: 1.1rem; }
+    .month-anecdote { font-size: 1.15rem; }
+    .photo-scatter { gap: 1.6rem 1.2rem; }
+    .invite-question { font-size: 1.5rem; }
   }
 </style>
 </head>
 <body>
-  <p>Casi lista... vuelve pronto 🌹</p>
+
+<div id="stage">
+  <div id="hearts-bg"></div>
+  <audio id="bg-audio" loop preload="auto"></audio>
+  <button id="mute-btn" aria-label="Silenciar música">&#128266;</button>
+  <div class="progress" id="progress"></div>
+  <!-- chapters injected by JS -->
+  <div id="fireworks"></div>
+  <div id="nav-controls">
+    <button id="back-btn">&#8592; Atrás</button>
+    <button id="next-btn">Siguiente</button>
+  </div>
+</div>
+
+<script>
+  const FOTOS_POR_MES = {
+    septiembre_inicio: [
+      "septiembre (1).jpeg", "septiembre (2).jpeg", "septiembre (3).jpeg", "septiembre (4).jpeg"
+    ],
+    octubre: [
+      "octubre (1).jpeg", "octubre (2).jpeg", "octubre (3).jpeg"
+    ],
+    noviembre: [
+      "noviembre (2).jpeg", "noviembre (4).jpeg"
+    ],
+    diciembre: [
+      "diciembre (1).jpeg", "diciembre (2).jpeg", "diciembre (3).jpeg", "diciembre (4).jpeg", "diciembre (5).jpeg"
+    ],
+    enero: [
+      "enero (1).jpeg", "enero (2).jpeg"
+    ],
+    febrero: [
+      "febrero (1).jpeg", "febrero (2).jpeg"
+    ],
+    marzo: [
+      "marzo  (1).jpeg", "marzo  (2).jpeg", "marzo  (3).jpeg"
+    ],
+    abril: [
+      "abril (1).jpeg", "abril (2).jpeg", "abril (3).jpeg"
+    ],
+    mayo: [
+      "mayo (1).jpeg", "mayo (2).jpeg", "mayo (3).jpeg", "mayo (4).jpeg", "mayo (5).jpeg"
+    ],
+    junio: [
+      "junio (1).jpeg", "junio (2).jpeg", "junio (3).jpeg", "junio (4).jpeg", "junio (5).jpeg"
+    ],
+    julio: [
+      "julio (1).jpeg", "julio (2).jpeg"
+    ],
+    agosto: [
+      "agosto (1).jpeg", "agosto (2).jpeg", "agosto (3).jpeg", "agosto (4).jpeg"
+    ],
+    septiembre_cierre: [
+      "septiembre2 (1).jpeg", "septiembre2 (2).jpeg", "septiembre2 (3).jpeg",
+      "septiembre2 (4).jpeg", "septiembre2 (5).jpeg", "septiembre2 (6).jpeg"
+    ],
+  };
+
+  const CAPITULOS = [
+    {
+      mes: "Septiembre",
+      key: "septiembre_inicio",
+      texto: "Aquí, por segunda vez, todo empezó. Este fue el mes en que finalmente oficializamos lo que sería el resto de nuestras vidas: llevábamos un año juntos, pero ese día finalmente novios oficiales."
+    },
+    {
+      mes: "Octubre",
+      key: "octubre",
+      texto: "Un mes más tranquilo, de esos que se disfrutan despacio: un paseo, una salida a comer, y flores hechas a mano."
+    },
+    {
+      mes: "Noviembre",
+      key: "noviembre",
+      texto: "Fotos en casa, demostrando que los planes más simples también son hermosos cuando son contigo."
+    },
+    {
+      mes: "Diciembre",
+      key: "diciembre",
+      texto: "Nuestro primer evento juntos como pareja: nos invitaron a una revelación de género. Y también el recuerdo de extender mis días en Valledupar solo para pasar el 7 de diciembre a tu lado, viendo los alumbrados en el Parque de la Provincia."
+    },
+    {
+      mes: "Enero",
+      key: "enero",
+      texto: "Un recordatorio de que el amor también se sostiene en la distancia: videollamadas que se convirtieron en compañía."
+    },
+    {
+      mes: "Febrero",
+      key: "febrero",
+      texto: "Tu cumpleaños. Un día precioso para celebrar la vida del amor de mi vida."
+    },
+    {
+      mes: "Marzo",
+      key: "marzo",
+      texto: "El cumpleaños de nuestra querida amiga Sálua."
+    },
+    {
+      mes: "Abril",
+      key: "abril",
+      texto: "Mi cumpleaños, y todo lo que hiciste para hacerme sentir especial ese día. Siempre estaré agradecido por eso, mi princesa hermosa."
+    },
+    {
+      mes: "Mayo",
+      key: "mayo",
+      texto: "Salidas para recordar: una cita cumpliendo nuestra meta de conocer un restaurante nuevo cada 27, y una tarde tranquila en el centro comercial, con helado y foticos como le gustan."
+    },
+    {
+      mes: "Junio",
+      key: "junio",
+      texto: "Un mes movido: nuestro primer viaje como novios a Santa Marta por fitopatología. Nuestro primer concierto Candlelight (el primero de muchos, con el favor de Dios), y los quince años de Nicol."
+    },
+    {
+      mes: "Julio",
+      key: "julio",
+      texto: "Como despedida antes de regresar a mi pueblo, una tarde de cine juntos."
+    },
+    {
+      mes: "Agosto",
+      key: "agosto",
+      texto: "De regreso a la vida académica y, sobre todo, de regreso a tu lado. Cine, el día de la novia, centro comercial: un mes diverso, planeado, y disfrutado."
+    },
+    {
+      mes: "Septiembre",
+      key: "septiembre_cierre",
+      subtitle: "lo que va de este mes",
+      texto: "Y aquí estamos, un año después. Recordando las flores amarillas, el 19 de septiembre, el día del amor y la amistad, y todos los momentos que ya construimos juntos, mientras seguimos llenando este álbum, con el favor de Dios."
+    },
+  ];
+
+  const TAUNTS = [
+    "inténtalo de nuevo",
+    "mmm, no lo creo",
+    "ese botón no funciona hoy",
+    "¿segura que quieres decir eso?",
+    "el otro botón se ve mejor",
+    "no cuenta si lo vuelves a intentar",
+    "casi, pero no",
+    "ese camino no lleva a ningún lado",
+    "el universo también vota por el sí",
+    "insiste cuanto quieras, no va a cambiar",
+    "ya casi no me alcanzas a ver, ¿eh?",
+    "ese botón se jubiló hace un rato",
+    "vas a tener que decir que sí tarde o temprano",
+    "última oportunidad de arrepentirte... es broma, no hay"
+  ];
+
+  const stage = document.getElementById('stage');
+  const navControls = document.getElementById('nav-controls');
+  const nextBtn = document.getElementById('next-btn');
+  const backBtn = document.getElementById('back-btn');
+  const progressEl = document.getElementById('progress');
+  const heartsBg = document.getElementById('hearts-bg');
+  const fireworksEl = document.getElementById('fireworks');
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let chapters = [];
+  let current = 0;
+  let rejectCount = 0;
+
+  function randomBetween(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  function buildHeartsBackground() {
+    if (prefersReducedMotion) return;
+    const colors = ['var(--white)', 'var(--pink)', 'var(--gold)'];
+    const HEART_COUNT = 22;
+    for (let i = 0; i < HEART_COUNT; i++) {
+      const heart = document.createElement('span');
+      heart.className = 'heart';
+      heart.textContent = '❤';
+      heart.style.left = `${randomBetween(2, 96)}%`;
+      heart.style.fontSize = `${randomBetween(0.6, 1.2).toFixed(2)}rem`;
+      heart.style.color = colors[Math.floor(Math.random() * colors.length)];
+      heart.style.animationDuration = `${randomBetween(8, 16).toFixed(1)}s`;
+      heart.style.animationDelay = `-${randomBetween(0, 16).toFixed(1)}s`;
+      heart.style.setProperty('--drift', `${randomBetween(-30, 30).toFixed(0)}px`);
+      heartsBg.appendChild(heart);
+    }
+  }
+
+  function launchFireworks() {
+    if (prefersReducedMotion) return;
+    fireworksEl.innerHTML = '';
+    const colors = ['var(--red-bright)', 'var(--gold)', 'var(--white)'];
+    const burstCount = 5;
+    for (let b = 0; b < burstCount; b++) {
+      setTimeout(() => {
+        const cx = randomBetween(20, 80);
+        const cy = randomBetween(15, 55);
+        const particleCount = 15;
+        for (let p = 0; p < particleCount; p++) {
+          const angle = (Math.PI * 2 * p) / particleCount + randomBetween(-0.15, 0.15);
+          const distance = randomBetween(60, 140);
+          const dx = Math.cos(angle) * distance;
+          const dy = Math.sin(angle) * distance;
+          const dot = document.createElement('span');
+          dot.className = 'fw-particle';
+          dot.style.left = `${cx}%`;
+          dot.style.top = `${cy}%`;
+          dot.style.setProperty('--dx', `${dx.toFixed(1)}px`);
+          dot.style.setProperty('--dy', `${dy.toFixed(1)}px`);
+          dot.style.color = colors[Math.floor(Math.random() * colors.length)];
+          dot.style.background = colors[Math.floor(Math.random() * colors.length)];
+          dot.style.animationDuration = `${randomBetween(0.8, 1.3).toFixed(2)}s`;
+          fireworksEl.appendChild(dot);
+          setTimeout(() => dot.remove(), 1400);
+        }
+      }, b * 450);
+    }
+  }
+
+  function buildGreetingChapter(index) {
+    const div = document.createElement('div');
+    div.className = 'chapter';
+    div.dataset.index = index;
+    div.innerHTML = `
+      <div class="ornament">&#10084;</div>
+      <p class="greeting-text">
+        Hola mi vida, ¿cómo estás? Nuevamente yo por aquí.
+        He diseñado este lugar para recordarte lo importante que eres para mí,
+        y para <strong>felicitarnos por haber permanecido juntos durante este año</strong>.
+      </p>
+    `;
+    return div;
+  }
+
+  function buildIntroChapter(index) {
+    const div = document.createElement('div');
+    div.className = 'chapter';
+    div.dataset.index = index;
+    div.innerHTML = `
+      <div class="ornament">&#10084;</div>
+      <p class="intro-text">
+        En este lugar vas a encontrar una pequeña recopilación de todo lo que vivimos
+        a lo largo de este año tan especial. Cada mes tiene su propia historia, sus
+        propios momentos, y quise guardarlos aquí para recorrerlos juntos una vez más.
+        Hubo risas, distancias que no importaron, y días comunes que se sintieron
+        extraordinarios solo por estar a tu lado. ¿Quieres verlo conmigo?
+      </p>
+    `;
+    return div;
+  }
+
+  const PHOTO_MAX_WIDTH = 340; // safety cap so an extra-wide photo never overflows the screen
+
+  function tileHeightFor(count) {
+    if (count <= 2) return 260;
+    if (count === 3) return 230;
+    if (count === 4) return 205;
+    if (count === 5) return 185;
+    return 165;
+  }
+
+  function fitImageToBox(img, targetHeight) {
+    const nw = img.naturalWidth;
+    const nh = img.naturalHeight;
+    if (!nw || !nh) {
+      img.style.opacity = '1';
+      return;
+    }
+    const scale = Math.min(targetHeight / nh, PHOTO_MAX_WIDTH / nw);
+    img.style.width = `${Math.round(nw * scale)}px`;
+    img.style.height = `${Math.round(nh * scale)}px`;
+    img.style.opacity = '1';
+  }
+
+  function buildMonthChapter(cap, index) {
+    const div = document.createElement('div');
+    div.className = 'chapter';
+    div.dataset.index = index;
+
+    const archivos = FOTOS_POR_MES[cap.key] || [];
+    const tileHeight = tileHeightFor(archivos.length);
+    let tilesHtml = '';
+    archivos.forEach((archivo) => {
+      const rot = randomBetween(-4, 4).toFixed(2);
+      const ty = randomBetween(-7, 7).toFixed(1);
+      const tx = randomBetween(-4, 4).toFixed(1);
+      const src = `fotos/${encodeURIComponent(archivo)}`;
+      tilesHtml += `
+        <div class="photo-tile" style="transform: rotate(${rot}deg) translate(${tx}px, ${ty}px);">
+          <div class="tile-frame"><img src="${src}" alt="${cap.mes}" loading="lazy" style="height:${tileHeight}px;"></div>
+        </div>
+      `;
+    });
+
+    div.innerHTML = `
+      <h1 class="month-title">${cap.mes}</h1>
+      ${cap.subtitle ? `<p class="month-subtitle">${cap.subtitle}</p>` : ''}
+      <div class="photo-scatter">
+        ${tilesHtml}
+      </div>
+      <p class="month-anecdote">${cap.texto}</p>
+    `;
+
+    div.querySelectorAll('.tile-frame img').forEach((img) => {
+      if (img.complete && img.naturalWidth) {
+        fitImageToBox(img, tileHeight);
+      } else {
+        img.addEventListener('load', () => fitImageToBox(img, tileHeight));
+        img.addEventListener('error', () => { img.style.opacity = '1'; });
+      }
+    });
+
+    return div;
+  }
+
+  function buildInviteIntroChapter(index) {
+    const div = document.createElement('div');
+    div.className = 'chapter';
+    div.dataset.index = index;
+    div.innerHTML = `
+      <div class="ornament">&#10084;</div>
+      <p class="intro-text">
+        Por todo lo que hemos vivido este año, y por todo lo que viviremos
+        más adelante, me gustaría preguntarte algo.
+      </p>
+    `;
+    return div;
+  }
+
+  function buildInviteQuestionChapter(index) {
+    const div = document.createElement('div');
+    div.className = 'chapter';
+    div.dataset.index = index;
+    div.innerHTML = `
+      <p class="invite-question">¿Me concederías el honor de pasar el día de mañana a tu lado?</p>
+      <div class="invite-buttons">
+        <button id="accept-btn">Sí</button>
+        <button id="reject-btn">No</button>
+      </div>
+      <p id="reject-taunt"></p>
+    `;
+    return div;
+  }
+
+  function buildAgendaChapter(index) {
+    const div = document.createElement('div');
+    div.className = 'chapter';
+    div.dataset.index = index;
+    div.innerHTML = `
+      <p class="agenda-message">
+        Me haces el hombre más feliz, honrado y bendecido del mundo entero,
+        mi princesa hermosa, el amor de mi vida. Espero que descanses bien,
+        mañana nuestra agenda está un poco apretada:
+      </p>
+      <ol class="agenda-list">
+        <li>Iglesia</li>
+        <li>Almuerzo</li>
+        <li>Descanso en casa</li>
+        <li>Parque de la Vida</li>
+        <li>Cena</li>
+        <li>&nbsp;</li>
+      </ol>
+    `;
+    return div;
+  }
+
+  function buildFinalChapter(index) {
+    const div = document.createElement('div');
+    div.className = 'chapter';
+    div.dataset.index = index;
+    div.innerHTML = `
+      <div class="final-icon">&#10084;</div>
+      <h1 class="final-title">Te veo mañana.</h1>
+      <button class="btn-goodbye" id="goodbye-btn">Hasta mañana</button>
+    `;
+    return div;
+  }
+
+  const MONTHS_START = 2;
+  const MONTHS_END = MONTHS_START + CAPITULOS.length - 1; // last month index (inclusive)
+  const INVITE_INTRO_INDEX = MONTHS_END + 1;
+  const INVITE_QUESTION_INDEX = MONTHS_END + 2;
+  const AGENDA_INDEX = MONTHS_END + 3;
+  const FINAL_INDEX = MONTHS_END + 4;
+
+  function init() {
+    buildHeartsBackground();
+    initAudio();
+
+    const greeting = buildGreetingChapter(0);
+    stage.insertBefore(greeting, navControls);
+    chapters.push(greeting);
+
+    const intro = buildIntroChapter(1);
+    stage.insertBefore(intro, navControls);
+    chapters.push(intro);
+
+    CAPITULOS.forEach((cap, i) => {
+      const chapter = buildMonthChapter(cap, MONTHS_START + i);
+      stage.insertBefore(chapter, navControls);
+      chapters.push(chapter);
+    });
+
+    const inviteIntro = buildInviteIntroChapter(INVITE_INTRO_INDEX);
+    stage.insertBefore(inviteIntro, navControls);
+    chapters.push(inviteIntro);
+
+    const inviteQuestion = buildInviteQuestionChapter(INVITE_QUESTION_INDEX);
+    stage.insertBefore(inviteQuestion, navControls);
+    chapters.push(inviteQuestion);
+
+    const agenda = buildAgendaChapter(AGENDA_INDEX);
+    stage.insertBefore(agenda, navControls);
+    chapters.push(agenda);
+
+    const finalChapter = buildFinalChapter(FINAL_INDEX);
+    stage.insertBefore(finalChapter, navControls);
+    chapters.push(finalChapter);
+
+    CAPITULOS.forEach(() => {
+      const dot = document.createElement('span');
+      progressEl.appendChild(dot);
+    });
+
+    chapters[0].classList.add('active');
+    updateProgress();
+    updateNavButtons();
+    attachInviteHandlers(inviteQuestion);
+    attachFinalHandler(finalChapter);
+
+    nextBtn.addEventListener('click', goNext);
+    backBtn.addEventListener('click', goBack);
+  }
+
+  function updateProgress() {
+    const dots = progressEl.querySelectorAll('span');
+    const inMonths = current >= MONTHS_START && current <= MONTHS_END;
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('done', inMonths && i <= current - MONTHS_START);
+    });
+    progressEl.style.display = inMonths ? 'flex' : 'none';
+  }
+
+  function updateNavButtons() {
+    const showNext = current <= INVITE_INTRO_INDEX || current === AGENDA_INDEX;
+    nextBtn.style.display = showNext ? 'inline-block' : 'none';
+    if (current === 0) {
+      nextBtn.textContent = '¿Quieres ver algo?';
+    } else if (current === 1) {
+      nextBtn.textContent = 'Sí, quiero verlo';
+    } else {
+      nextBtn.textContent = 'Siguiente';
+    }
+
+    const showBack = current > 0 && current <= INVITE_QUESTION_INDEX;
+    backBtn.style.display = showBack ? 'inline-block' : 'none';
+  }
+
+  function goNext() {
+    if (current >= chapters.length - 1) return;
+    const from = chapters[current];
+    const to = chapters[current + 1];
+
+    from.classList.add('leaving');
+    from.classList.remove('active');
+
+    current += 1;
+    to.classList.remove('leaving');
+    void to.offsetWidth;
+    to.classList.add('active');
+
+    updateProgress();
+    updateNavButtons();
+
+    setTimeout(() => from.classList.remove('leaving'), 650);
+  }
+
+  function goBack() {
+    if (current <= 0) return;
+    const from = chapters[current];
+    const to = chapters[current - 1];
+
+    from.classList.add('leaving-reverse');
+    from.classList.remove('active');
+
+    current -= 1;
+    to.classList.add('entering-reverse');
+    void to.offsetWidth;
+    to.classList.remove('entering-reverse');
+    to.classList.add('active');
+
+    updateProgress();
+    updateNavButtons();
+
+    setTimeout(() => from.classList.remove('leaving-reverse'), 650);
+  }
+
+  function attachInviteHandlers(inviteChapter) {
+    const acceptBtn = inviteChapter.querySelector('#accept-btn');
+    const rejectBtn = inviteChapter.querySelector('#reject-btn');
+    const taunt = inviteChapter.querySelector('#reject-taunt');
+
+    let acceptScale = 1;
+    let rejectScale = 1;
+
+    rejectBtn.addEventListener('click', () => {
+      taunt.textContent = TAUNTS[Math.min(rejectCount, TAUNTS.length - 1)];
+      rejectCount += 1;
+
+      acceptScale = Math.min(acceptScale + 0.28, 4.2);
+      rejectScale = Math.max(rejectScale - 0.16, 0.15);
+
+      acceptBtn.style.transform = `scale(${acceptScale})`;
+      acceptBtn.style.fontSize = `${1.15 + acceptScale * 0.15}rem`;
+      acceptBtn.style.boxShadow = `0 10px ${30 + acceptScale * 10}px -10px rgba(0,0,0,${Math.min(0.6 + acceptScale * 0.05, 0.95)})`;
+
+      rejectBtn.style.transform = `scale(${rejectScale})`;
+      rejectBtn.style.opacity = `${Math.max(1 - rejectCount * 0.15, 0.05)}`;
+    });
+
+    acceptBtn.addEventListener('click', () => {
+      celebrateAndShowAgenda();
+    });
+  }
+
+  function attachFinalHandler(finalChapter) {
+    const goodbyeBtn = finalChapter.querySelector('#goodbye-btn');
+    goodbyeBtn.addEventListener('click', () => {
+      window.location.href = 'https://www.youtube.com/watch?v=yKNxeF4KMsY';
+    });
+  }
+
+  function celebrateAndShowAgenda() {
+    const from = chapters[current];
+    const to = chapters[AGENDA_INDEX];
+
+    from.classList.remove('active');
+    from.classList.add('leaving');
+
+    nextBtn.style.display = 'none';
+    backBtn.style.display = 'none';
+    progressEl.style.display = 'none';
+
+    launchFireworks();
+
+    const delay = prefersReducedMotion ? 0 : 3000;
+    setTimeout(() => {
+      current = AGENDA_INDEX;
+      from.classList.remove('leaving');
+      void to.offsetWidth;
+      to.classList.add('active');
+      updateNavButtons();
+    }, delay);
+  }
+
+  function initAudio() {
+    const bgAudio = document.getElementById('bg-audio');
+    const muteBtn = document.getElementById('mute-btn');
+    bgAudio.src = encodeURI('Coldplay - Yellow (official instrumental).mp3');
+    bgAudio.loop = true;
+
+    const TARGET_VOLUME = 0.55;
+    const FADE_MS = 2500;
+    bgAudio.volume = 0;
+
+    let fadeInterval = null;
+    function fadeInAudio() {
+      if (fadeInterval) return;
+      const steps = 30;
+      const increment = TARGET_VOLUME / steps;
+      let step = 0;
+      fadeInterval = setInterval(() => {
+        step += 1;
+        bgAudio.volume = Math.min(TARGET_VOLUME, increment * step);
+        if (step >= steps) {
+          clearInterval(fadeInterval);
+          fadeInterval = null;
+        }
+      }, FADE_MS / steps);
+    }
+    bgAudio.addEventListener('play', fadeInAudio, { once: true });
+
+    const attemptPlay = () => bgAudio.play().catch(() => {});
+
+    const playPromise = bgAudio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        const resumeOnInteraction = () => {
+          attemptPlay();
+          document.removeEventListener('click', resumeOnInteraction);
+          document.removeEventListener('touchstart', resumeOnInteraction);
+        };
+        document.addEventListener('click', resumeOnInteraction, { once: true });
+        document.addEventListener('touchstart', resumeOnInteraction, { once: true });
+      });
+    }
+
+    let isMuted = false;
+    muteBtn.addEventListener('click', () => {
+      isMuted = !isMuted;
+      bgAudio.muted = isMuted;
+      muteBtn.innerHTML = isMuted ? '&#128263;' : '&#128266;';
+      if (!isMuted && bgAudio.paused) {
+        attemptPlay();
+      }
+    });
+  }
+
+  init();
+</script>
 </body>
 </html>
